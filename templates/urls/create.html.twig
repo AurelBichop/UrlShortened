@@ -3,5 +3,7 @@
 {% block body %}
     <h1>The Best URL shortener out there!</h1>
 
-    {{ form(form) }}
+    {{ form_start(form, {'attr':{'novalidate':'novalidate'}}) }}
+        {{ form_widget(form) }}
+    {{ form_end(form) }}
 {% endblock %}
