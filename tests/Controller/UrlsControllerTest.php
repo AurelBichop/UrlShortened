@@ -50,15 +50,43 @@ class UrlsControllerTest extends WebTestCase
         $client = static::createClient();
         $em = self::$container->get('doctrine')->getManager();
 
-        $url = new Url;
-        $url->setOriginal('https://framasoft.org');
+        $original = 'https://framasoft.org';
         $shortened = Str::random(6);
+
+        $url = new Url;
+        $url->setOriginal($original);
         $url->setShortened($shortened);
 
         $em->persist($url);
         $em->flush();
 
         $client->request('GET', '/'.$shortened);
-        $this->assertResponseRedirects();
+        $this->assertResponseRedirects($original);
+    }
+
+    /**
+     * @test
+     */
+    public function preview_shortened_version_should_work(){
+        $client = static::createClient();
+        $em = self::$container->get('doctrine')->getManager();
+
+        $original = 'https://www.gnu.org/';
+        $shortened = Str::random(6);
+
+        $url = new Url;
+        $url->setOriginal($original);
+        $url->setShortened($shortened);
+
+        $em->persist($url);
+        $em->flush();
+
+        $client->request('GET', sprintf('/%s/preview',$shortened));
+        //dd($client->getResponse());
+        $this->assertSelectorTextContains('h1', 'Yay! Here is your shortened URL:');
+        $this->assertSelectorTextContains('h1 > a', 'http://localhost/'.$shortened);
+
+        $client->clickLink('Go back home');
+        $this->assertRouteSame('app_home');
     }
 }
