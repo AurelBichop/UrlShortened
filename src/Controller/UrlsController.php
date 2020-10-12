@@ -14,8 +14,8 @@ use Symfony\Component\Validator\Constraints\Url as UrlConstraint;
 class UrlsController extends AbstractController
 {
     /**
-     * @Route("/", name="app_home")
-     * @Route("/", name="app_urls_create")
+     * @Route("/", name="app_home", methods="GET|POST")
+     * @Route("/", name="app_urls_create", methods="GET|POST")
      *
      * @param Request $request
      * @param UrlRepository $urlRepository
@@ -44,8 +44,8 @@ class UrlsController extends AbstractController
             $url = $urlRepository->findOneBy(['original'=> $form['original']->getData()]);
             //si oui
             if($url){
-                //on retourne la version preview
-                return $this->render('urls/preview.html.twig',compact('url'));
+                //on redirige bonne pratique suite a POST
+                return $this->redirectToRoute('app_urls_preview',['shortened'=>$url->getShortened()]);
             }
 
 
@@ -57,8 +57,19 @@ class UrlsController extends AbstractController
         ]);
     }
 
+
     /**
-     * @Route ("/{shortened}",name="app_urls_show")
+     * @Route ("/{shortened}/preview",name="app_urls_preview", methods="GET")
+     *
+     * @param Url $url
+     * @return Response
+     */
+    public function preview(Url $url):Response{
+        return $this->render('urls/preview.html.twig',compact('url'));
+    }
+
+    /**
+     * @Route ("/{shortened}",name="app_urls_show", methods="GET")
      *
      * @param Url $url
      * @return Response
