@@ -2,6 +2,8 @@
 
 namespace App\Tests\Controller;
 
+use App\Entity\Url;
+use App\Utils\Str;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class UrlsControllerTest extends WebTestCase
@@ -38,6 +40,25 @@ class UrlsControllerTest extends WebTestCase
             'form[original]'=>'https://python.org'
         ]);
 
+        $this->assertResponseRedirects();
+    }
+
+    /**
+     * @test
+     */
+    public function shortened_version_should_redirect_to_original_url(){
+        $client = static::createClient();
+        $em = self::$container->get('doctrine')->getManager();
+
+        $url = new Url;
+        $url->setOriginal('https://framasoft.org');
+        $shortened = Str::random(6);
+        $url->setShortened($shortened);
+
+        $em->persist($url);
+        $em->flush();
+
+        $client->request('GET', '/'.$shortened);
         $this->assertResponseRedirects();
     }
 }
