@@ -24,7 +24,7 @@ class Url
     private $original;
 
     /**
-     * @ORM\Column(type="string", length=255, unique=true)
+     * @ORM\Column(type="string", length=6, unique=true)
      */
     private $shortened;
 
