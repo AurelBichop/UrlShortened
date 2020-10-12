@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Url;
 use App\Repository\UrlRepository;
+use App\Utils\Str;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -94,7 +95,7 @@ class UrlsController extends AbstractController
     }
 
     private function getUniqueShortenedString():string{
-         $shortened = substr(bin2hex(random_bytes(32)),0,6);
+         $shortened = Str::random(6);
 
          if($this->urlRepository->findOneBy(compact('shortened'))){
             return $this->getUniqueShortenedString();
