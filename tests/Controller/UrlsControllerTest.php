@@ -28,7 +28,7 @@ class UrlsControllerTest extends WebTestCase
     /**
      * @test
      */
-    public function form_should_work_with_valid_data()
+    public function create_should_shorten_url_if_that_doesnt_exists()
     {
         $client = static::createClient();
         $crawler = $client->request('GET', '/');
@@ -37,11 +37,49 @@ class UrlsControllerTest extends WebTestCase
 
         $form = $crawler->filter('form')->form();
 
+        $original = 'https://python.org';
+
         $client->submit($form, [
-            'form[original]'=>'https://python.org'
+            'form[original]'=>$original
         ]);
 
-        $this->assertResponseRedirects();
+        $em = static::$container->get('doctrine')->getManager();
+
+        $urlRepository = $em->getRepository(Url::class);
+
+        $url = $urlRepository->findOneBy(compact('original'));
+
+        $this->assertResponseRedirects(sprintf('/%s/preview',$url->getShortened()));
+    }
+
+    /**
+     * @test
+     */
+    public function create_should_shorten_url_once()
+    {
+        $client = static::createClient();
+
+        $em = static::$container->get('doctrine')->getManager();
+
+        $url = new Url;
+        $url->setOriginal("https://symfony.com");
+        $url->setShortened('qwerty');
+        $em->persist($url);
+        $em->flush();
+
+        $crawler = $client->request('GET', '/');
+
+        $form = $crawler->filter('form')->form();
+
+        $client->submit($form, [
+            'form[original]'=>'https://symfony.com'
+        ]);
+
+        $this->assertResponseRedirects('/qwerty/preview');
+
+        $urlRepository = $em->getRepository(Url::class);
+
+        $this->assertCount(1,$urlRepository->findAll());
     }
 
     /**
@@ -57,7 +95,6 @@ class UrlsControllerTest extends WebTestCase
         $url = new Url;
         $url->setOriginal($original);
         $url->setShortened($shortened);
-
         $em->persist($url);
         $em->flush();
 
