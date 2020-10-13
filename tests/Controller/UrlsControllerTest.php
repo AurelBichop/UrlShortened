@@ -3,7 +3,8 @@
 namespace App\Tests\Controller;
 
 use App\Entity\Url;
-use App\Utils\Str;
+
+use Illuminate\Support\Str;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class UrlsControllerTest extends WebTestCase
@@ -81,10 +82,12 @@ class UrlsControllerTest extends WebTestCase
         $em->persist($url);
         $em->flush();
 
-        $client->request('GET', sprintf('/%s/preview',$shortened));
+        $crawler = $client->request('GET', sprintf('/%s/preview',$shortened));
         //dd($client->getResponse());
         $this->assertSelectorTextContains('h1', 'Yay! Here is your shortened URL:');
         $this->assertSelectorTextContains('h1 > a', 'http://localhost/'.$shortened);
+
+        $this->assertSame('http://localhost/'.$shortened,$crawler->filter('h1 > a')->attr('href'));
 
         $client->clickLink('Go back home');
         $this->assertRouteSame('app_home');

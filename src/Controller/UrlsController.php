@@ -4,8 +4,9 @@ namespace App\Controller;
 
 use App\Entity\Url;
 use App\Repository\UrlRepository;
-use App\Utils\Str;
+
 use Doctrine\ORM\EntityManagerInterface;
+use Illuminate\Support\Str;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
