@@ -47,7 +47,7 @@ class UrlsControllerTest extends WebTestCase
     /**
      * @test
      */
-    public function shortened_version_should_redirect_to_original_url(){
+    public function shortened_version_should_redirect_to_original_url_if_shortened_exists(){
         $client = static::createClient();
         $em = self::$container->get('doctrine')->getManager();
 
@@ -68,7 +68,18 @@ class UrlsControllerTest extends WebTestCase
     /**
      * @test
      */
-    public function preview_shortened_version_should_work(){
+    public function show_should_return_404_response_if_shortened_doesnt_exists(){
+        $client = static::createClient();
+
+        $client->request('GET', '/qwerty');
+
+        $this->assertResponseStatusCodeSame(404);
+    }
+
+    /**
+     * @test
+     */
+    public function preview_shortened_version_should_work_if_shortened_exist(){
         $client = static::createClient();
         $em = self::$container->get('doctrine')->getManager();
 
@@ -91,5 +102,16 @@ class UrlsControllerTest extends WebTestCase
 
         $client->clickLink('Go back home');
         $this->assertRouteSame('app_home');
+    }
+
+    /**
+     * @test
+     */
+    public function preview_should_return_404_response_if_shortened_doesnt_exists(){
+        $client = static::createClient();
+
+        $client->request('GET', '/qwerty/preview');
+
+        $this->assertResponseStatusCodeSame(404);
     }
 }
