@@ -14,19 +14,15 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class UrlsController extends AbstractController
 {
-    private $urlRepository;
-
-    public function __construct(UrlRepository $urlRepository){
-        $this->urlRepository = $urlRepository;
-    }
     /**
      * @Route("/", name="app_home", methods="GET|POST")
      *
      * @param Request $request
+     * @param UrlRepository $urlRepository
      * @param EntityManagerInterface $em
      * @return Response
      */
-    public function create(Request $request, EntityManagerInterface $em):Response
+    public function create(Request $request, UrlRepository $urlRepository,EntityManagerInterface $em):Response
     {
         $form = $this->createForm(UrlFormType::class);
 
@@ -35,7 +31,7 @@ class UrlsController extends AbstractController
         if($form->isSubmitted() && $form->isValid()){
             //valider les infos
             //on vérif si url entré a déja été raccourcie
-            $url = $this->urlRepository->findOneBy(['original'=> $form['original']->getData()]);
+            $url = $urlRepository->findOneBy(['original'=> $form['original']->getData()]);
 
             if(!$url){
 
