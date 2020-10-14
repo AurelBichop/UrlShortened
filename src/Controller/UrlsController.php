@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Url;
+use App\Form\UrlFormType;
 use App\Repository\UrlRepository;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -11,8 +12,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Url as UrlConstraint;
 
 class UrlsController extends AbstractController
 {
@@ -30,18 +29,7 @@ class UrlsController extends AbstractController
      */
     public function create(Request $request, EntityManagerInterface $em):Response
     {
-        $form = $this->createFormBuilder()
-            ->add('original', null,[
-                'label' => false,
-                'attr'  =>[
-                    'placeholder' => 'Enter the URL to shorter here'
-                ],
-                'constraints' => [
-                    new NotBlank(['message'=>'You need to enter a URL']),
-                    new UrlConstraint(['message'=>'The URL entered is invalid'])
-                ]
-            ])
-            ->getForm();
+        $form = $this->createForm(UrlFormType::class);
 
         $form->handleRequest($request);
 
@@ -49,22 +37,16 @@ class UrlsController extends AbstractController
             //valider les infos
             //on vérif si url entré a déja été raccourcie
             $url = $this->urlRepository->findOneBy(['original'=> $form['original']->getData()]);
-            //si oui
-            if($url){
-                //on redirige bonne pratique suite a POST
-                return $this->redirectToRoute('app_urls_preview',['shortened'=>$url->getShortened()]);
+
+            if(!$url){
+
+                $url = $form->getData();
+                $url->setShortened($this->getUniqueShortenedString());
+                $em->persist($url);
+                $em->flush();
             }
 
-            //si l'url n'a pas déja été raccourcie
-            //alors on va la raccourcir
-            // et retournezr la version preview raccourcie
-            $url = new Url;
-            $url->setOriginal($form['original']->getData());
-            $url->setShortened($this->getUniqueShortenedString());
-
-            $em->persist($url);
-            $em->flush();
-
+            //on redirige bonne pratique suite a un POST
             return $this->redirectToRoute('app_urls_preview',['shortened'=>$url->getShortened()]);
         }
 

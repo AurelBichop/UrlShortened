@@ -21,7 +21,7 @@ class UrlsControllerTest extends WebTestCase
         $this->assertPageTitleSame('Botly');
         $this->assertSelectorTextContains('h1', 'The Best URL shortener out there!');
         $this->assertSelectorExists('form');
-        $this->assertSelectorExists('input[name="form[original]"]');
+        $this->assertSelectorExists('input[name="url_form[original]"]');
         $this->assertSelectorExists('input[placeholder="Enter the URL to shorter here"]');
     }
 
@@ -40,7 +40,7 @@ class UrlsControllerTest extends WebTestCase
         $original = 'https://python.org';
 
         $client->submit($form, [
-            'form[original]'=>$original
+            'url_form[original]'=>$original
         ]);
 
         $em = static::$container->get('doctrine')->getManager();
@@ -72,7 +72,7 @@ class UrlsControllerTest extends WebTestCase
         $form = $crawler->filter('form')->form();
 
         $client->submit($form, [
-            'form[original]'=>'https://symfony.com'
+            'url_form[original]'=>'https://symfony.com'
         ]);
 
         $this->assertResponseRedirects('/qwerty/preview');
@@ -164,7 +164,7 @@ class UrlsControllerTest extends WebTestCase
 
 
         $client->submit($form, [
-            'form[original]'=>''
+            'url_form[original]'=>''
         ]);
 
         $this->assertSelectorTextContains('ul > li', 'You need to enter a URL');
@@ -181,7 +181,7 @@ class UrlsControllerTest extends WebTestCase
         $form = $crawler->filter('form')->form();
 
         $client->submit($form, [
-            'form[original]'=>'tyht yhtryh yt'
+            'url_form[original]'=>'tyht'
         ]);
 
         $this->assertSelectorTextContains('ul > li', 'The URL entered is invalid');
