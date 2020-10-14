@@ -2,11 +2,15 @@
 <html>
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device_width, initial-scale=1, shrink-yo-fit=no">
         <title>{% block title %}Botly{% endblock %}</title>
-        {% block stylesheets %}{% endblock %}
+        {% block stylesheets %}
+            <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+        {% endblock %}
     </head>
     <body>
-        {% block body %}{% endblock %}
-        {% block javascripts %}{% endblock %}
+        <main role="main" class="wrapper">
+            {% block body %}{% endblock %}
+        </main>
     </body>
 </html>
