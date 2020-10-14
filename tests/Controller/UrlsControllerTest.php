@@ -28,7 +28,7 @@ class UrlsControllerTest extends WebTestCase
     /**
      * @test
      */
-    public function create_should_shorten_url_if_that_doesnt_exists()
+    public function create_should_shorten_url_if_that_url_hasnt_been_shortened_yet()
     {
         $client = static::createClient();
         $crawler = $client->request('GET', '/');

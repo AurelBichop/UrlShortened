@@ -7,7 +7,6 @@ use App\Form\UrlFormType;
 use App\Repository\UrlRepository;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Illuminate\Support\Str;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,7 +40,7 @@ class UrlsController extends AbstractController
             if(!$url){
 
                 $url = $form->getData();
-                $url->setShortened($this->getUniqueShortenedString());
+                //$url->setShortened($this->getUniqueShortenedString());
                 $em->persist($url);
                 $em->flush();
             }
@@ -74,15 +73,5 @@ class UrlsController extends AbstractController
      */
     public function show(Url $url):Response{
         return $this->redirect($url->getOriginal());
-    }
-
-    private function getUniqueShortenedString():string{
-         $shortened = Str::random(6);
-
-         if($this->urlRepository->findOneBy(compact('shortened'))){
-            return $this->getUniqueShortenedString();
-         }
-
-         return $shortened;
     }
 }
